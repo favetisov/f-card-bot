@@ -26,7 +26,7 @@ Main thing that I missed when exploring other products was ability to add "not a
 Other big thing is the ability to add extended information to your answers. [Contextual learning](https://en.wikipedia.org/wiki/Contextual_learning) plays key role in memorizing process, so it is useful to add comments and personal experience notes to the card. 
 
 
-## Why Telegram?
+### Why Telegram?
 
 They are tons of products in application stores that are made for this purposes. Bad news are, that users spend 80% of their time for three favorite applications. So, to my experience, even if you have memorizing apps installed on your phone, you will forget about them pretty soon (what an irony, huh).
 Push notifications can help apps last on your horizon a little longer, but they don't solve the main problem. 
@@ -38,12 +38,12 @@ Telegram bots seem to be the best soluiton here:
 
 # Get started 
 
-Open your telegram, find F-Cards Bot via searchbar, or open [direct link](https://t.me/f_cards_bot)
+Open your telegram, find _"F-Cards Bot"_ via searchbar, or open [direct link](https://t.me/f_cards_bot)
 
 type `/start` to shake bot's hand
 
 `/use CATEGORY_NAME`  to select a category. If category doesn't exists (none exists at the beginning), new category will be created. 
-__category is a group of cards, combined with one team. E.g. "english words", "math exam", etc.__
+_category is a group of cards, combined with one team. E.g. "english words", "math exam", etc._
 
 `/add` to start adding questions. You will be ased to provide question, anwer and description (or the quesion only). Fields can contain text, photo, video and audio. 
 
