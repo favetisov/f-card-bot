@@ -4,7 +4,8 @@
   "description": "Telegram bot that helps you study",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon --watch ./src -e ts --exec 'node_modules/typescript/bin/tsc && jest dist'",
+    "test": "jest dist/tests"
   },
   "repository": {
     "type": "git",
@@ -13,13 +14,18 @@
   "keywords": [
     "telegram",
     "bot",
-    "flash",
-    "cards"
+    "flash cards"
   ],
   "author": "Fedor Avetisov",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/favetisov/f-card-bot/issues"
   },
-  "homepage": "https://github.com/favetisov/f-card-bot#readme"
+  "homepage": "https://github.com/favetisov/f-card-bot#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.7",
+    "jest": "^26.2.1",
+    "nodemon": "^2.0.4",
+    "typescript": "^3.9.7"
+  }
 }
