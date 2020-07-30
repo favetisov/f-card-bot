@@ -1,0 +1,25 @@
+{
+  "name": "f-cards-bot",
+  "version": "0.0.1",
+  "description": "Telegram bot that helps you study",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/favetisov/f-card-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "flash",
+    "cards"
+  ],
+  "author": "Fedor Avetisov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/favetisov/f-card-bot/issues"
+  },
+  "homepage": "https://github.com/favetisov/f-card-bot#readme"
+}
