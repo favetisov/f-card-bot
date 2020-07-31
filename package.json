@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch ./src -e ts --exec 'npm run build && npm run test'",
-    "build": "rm -rf dist && node_modules/typescript/bin/tsc",
+    "build": "rm -rf dist && node_modules/typescript/bin/tsc src/lambdas/ping.ts --outDir dist",
     "test": "node_modules/jest/bin/jest.js dist",
     "postinstal": "npm run build"
   },
