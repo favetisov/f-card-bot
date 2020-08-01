@@ -28,14 +28,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - run: npm ci
-      - run: npm run build
       - name: Setup gcloud environment
         uses: GoogleCloudPlatform/github-actions@0.1.2
         with:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-
-      - run: node ./scripts/deploy.js
-        env:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          region: europe-west3
+      - run: npm run deploy
