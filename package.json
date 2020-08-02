@@ -1,6 +1,6 @@
 {
   "name": "f-cards-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Telegram bot that helps you study",
   "main": "index.js",
   "scripts": {
@@ -29,6 +29,7 @@
   "homepage": "https://github.com/favetisov/f-card-bot#readme",
   "devDependencies": {
     "@types/jest": "^26.0.8",
+    "conventional-changelog-cli": "^2.0.34",
     "inquirer": "^7.3.3",
     "jest": "^26.2.1",
     "nodemon": "^2.0.4",
