@@ -1,5 +1,5 @@
-import { ping } from "./ping";
+import { ping } from './ping';
 
 test('simple ping test', () => {
-    expect(ping({})).toBe('pong44');
+  expect(ping({})).toBe('pong44');
 });

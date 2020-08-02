@@ -1,6 +1,6 @@
-import { ping } from "./middleware/ping";
+import { ping } from './middleware/ping';
 
 export const onmessage = (req, res) => {
-    const result = ping(req.body);
-    res.send(result);
-}
+  const result = ping(req.body);
+  res.send(result);
+};
