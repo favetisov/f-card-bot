@@ -1,3 +1,7 @@
+## [0.0.6](https://github.com/favetisov/f-card-bot/compare/0.0.5...0.0.6) (2020-08-02)
+
+
+
 ## 0.0.5 (2020-08-02)
 
 
