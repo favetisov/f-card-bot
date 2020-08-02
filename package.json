@@ -7,6 +7,7 @@
     "start": "nodemon --watch ./src -e ts --exec 'npm t'",
     "build": "npm run clean && ./node_modules/typescript/bin/tsc",
     "clean": "rimraf 'dist'",
+    "release": "npm run build && node scripts/release.js",
     "deploy": "npm run build && node scripts/deploy.js",
     "test": "node_modules/jest/bin/jest.js src",
     "postinstal": "npm run build"
@@ -28,9 +29,12 @@
   "homepage": "https://github.com/favetisov/f-card-bot#readme",
   "devDependencies": {
     "@types/jest": "^26.0.8",
+    "inquirer": "^7.3.3",
     "jest": "^26.2.1",
     "nodemon": "^2.0.4",
     "rimraf": "^3.0.2",
+    "semver": "^7.3.2",
+    "simple-git": "^2.15.0",
     "ts-jest": "^26.1.4",
     "typescript": "^3.9.7"
   }

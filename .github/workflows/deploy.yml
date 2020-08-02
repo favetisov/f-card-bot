@@ -1,10 +1,9 @@
 name: Deploy on production
 
-on: push
-#on:
-#  push:
-#    tags:
-#      - '*'
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
