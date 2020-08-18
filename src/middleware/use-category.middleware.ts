@@ -2,7 +2,7 @@ import { WebhookRequest } from '../models/webhook-request';
 
 export const useCategoryMiddleware = (request: WebhookRequest) => {
   if (request.answer) return;
-  if (!request.message.text) return;
+  if (!request.message?.text) return;
   if (request.message.text.indexOf('/list') !== 0) return;
 
   const categories = [];
