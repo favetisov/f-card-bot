@@ -1,13 +1,15 @@
 import { pingMiddleware } from './middleware/ping.middleware';
 import { WebhookRequest } from './models/webhook-request';
 import { Middleware } from './models/middleware';
-// import { noResponseMiddleware } from './middleware/no-response.middleware';
-import { useCategoryMiddleware } from './middleware/use-category.middleware';
+import { categoryMiddleware } from './middleware/category.middleware';
 
-const middlewareChain: Middleware[] = [pingMiddleware, useCategoryMiddleware];
+const middlewareChain: Middleware[] = [pingMiddleware, categoryMiddleware];
 
 export const onmessage = async (req, res) => {
-  const request = new WebhookRequest(req.body.message);
+  const request = new WebhookRequest();
+  request.message = req.body.message;
+  request.callbackQuery = req.body.callback_query;
+
   for (let run of middlewareChain) {
     await run(request);
   }
