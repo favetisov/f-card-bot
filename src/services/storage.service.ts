@@ -1,16 +1,21 @@
 import { Category } from '../models/category';
+import { Firestore } from '@google-cloud/firestore';
 
-const db = {}; // simply writing db to memory. we should update this to work with firebase storage
+const db = new Firestore({
+  projectId: 'f-cards-bot',
+});
 
 interface Value {
   state: string;
   categories: Category[];
 }
 
-export const load = (chatId: number): Value => {
+export const load = async (chatId: number): Promise<Value> => {
+  const collection = await db.collection('f-cards-bot').get();
+  console.log(collection);
   return db[chatId];
 };
 
-export const save = (chatId: number, value: Value) => {
+export const save = async (chatId: number, value: Value) => {
   db[chatId] = value;
 };
