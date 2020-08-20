@@ -24,7 +24,8 @@ export const onmessage = async (req, res) => {
   }
 
   /** debug */
-  await request.botRequest('sendMessage', { chatId: request.message?.chat.id, text: 'feeling good' });
+  const response = await request.botRequest('sendMessage', { chat_id: request.message?.chat.id, text: 'feeling good' });
+  console.log(response);
 
   /** remove this after deployment is completed */
   if (!request.answer) {
@@ -63,6 +64,7 @@ const setBotRequest = (request: WebhookRequest) => {
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' },
     });
+    console.log(`https://api.telegram.org/bot${environment.botToken}/${method}`, params);
     return response.json();
   };
 };
