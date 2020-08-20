@@ -28,7 +28,7 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
 };
 
 const listCategories = async (request) => {
-  const categories = (await load(request.message.chat.id)).categories;
+  const categories = (await load(request.message.chat.id))?.categories || [];
 
   if (!categories?.length) {
     request.answer = {

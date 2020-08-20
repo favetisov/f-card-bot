@@ -12,7 +12,6 @@ interface Value {
 
 export const load = async (chatId: number): Promise<Value> => {
   const collection = await db.collection('f-cards-bot').get();
-  console.log(collection);
   return db[chatId];
 };
 
