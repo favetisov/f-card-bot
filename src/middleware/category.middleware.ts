@@ -1,5 +1,4 @@
 import { WebhookRequest } from '../models/webhook-request';
-import { load, save } from '../services/storage.service';
 
 const COMMANDS = {
   create: 'cmd_create_category',
@@ -17,10 +16,7 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
     return listCategories(request);
   } else if (request.callbackQuery?.data == COMMANDS.create) {
     return onCreateCallback(request);
-  } else if (
-    request.message?.text &&
-    (await load(request.message?.chat?.id))?.state === STATES.waitingForCategoryName
-  ) {
+  } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get('state'))) {
     return createCategory(request);
   } else if (request.callbackQuery?.data == COMMANDS.cancelCreation) {
     return cancelCreation(request);
@@ -28,7 +24,7 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
 };
 
 const listCategories = async (request) => {
-  const categories = (await load(request.message.chat.id))?.categories || [];
+  const categories = await request.userData.get('categories');
 
   if (!categories?.length) {
     request.answer = {
@@ -52,9 +48,7 @@ const listCategories = async (request) => {
 };
 
 export const onCreateCallback = async (request) => {
-  const chatId = request.callbackQuery.message.chat.id;
-  const userData = (await load(chatId)) || {};
-  await save(chatId, Object.assign(userData, { state: STATES.waitingForCategoryName }));
+  await request.userData.update({ state: STATES.waitingForCategoryName });
   request.answer = {
     method: 'sendMessage',
     chat_id: request.callbackQuery.message.chat.id,
@@ -71,9 +65,8 @@ export const createCategory = async (request) => {
   if (request.message.text.indexOf('\n') !== -1) {
     categoryDescription = request.message.text.slice(request.message.text.indexOf('\n')).trim();
   }
-  const userData = await load(request.message.chat.id);
-  if (!userData.categories) userData.categories = [];
-  if (userData.categories.find((c) => c.name == categoryName)) {
+  const categories = await request.userData.get('categories');
+  if (categories.find((c) => c.name == categoryName)) {
     return (request.answer = {
       method: 'sendMessage',
       chat_id: request.message.chat.id,
@@ -83,8 +76,8 @@ export const createCategory = async (request) => {
       },
     });
   } else {
-    userData.categories.push({ name: categoryName, description: categoryDescription, cards: [] });
-    await save(request.message.chat.id, userData);
+    categories.push({ name: categoryName, description: categoryDescription, cards: [] });
+    await request.userData.update({ categories });
     return (request.answer = {
       method: 'sendMessage',
       chat_id: request.message.chat.id,
@@ -94,7 +87,5 @@ export const createCategory = async (request) => {
 };
 
 export const cancelCreation = async (request) => {
-  const chatId = request.callbackQuery.message.chat.id;
-  const userData = (await load(chatId)) || {};
-  await save(chatId, Object.assign(userData, { state: null }));
+  return request.userData.update({ state: '' });
 };

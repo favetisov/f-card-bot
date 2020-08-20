@@ -14,8 +14,8 @@ export interface SendMessageAnswer extends Answer {
 }
 
 export class WebhookRequest {
-  chatStates: any;
   message?: Message;
   callbackQuery?: CallbackQuery;
   answer: NullAnswer | SendMessageAnswer;
+  userData: any;
 }
