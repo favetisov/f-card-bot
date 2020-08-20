@@ -10,22 +10,25 @@ const STATES = {
   waitingForCategoryName: 'waiting_for_category_name',
 };
 
-export const categoryMiddleware = (request: WebhookRequest) => {
+export const categoryMiddleware = async (request: WebhookRequest) => {
   if (request.answer) return;
 
   if (request.message?.text?.indexOf('/list') === 0) {
     return listCategories(request);
   } else if (request.callbackQuery?.data == COMMANDS.create) {
     return onCreateCallback(request);
-  } else if (request.message?.text && load(request.message?.chat?.id)?.state === STATES.waitingForCategoryName) {
+  } else if (
+    request.message?.text &&
+    (await load(request.message?.chat?.id))?.state === STATES.waitingForCategoryName
+  ) {
     return createCategory(request);
   } else if (request.callbackQuery?.data == COMMANDS.cancelCreation) {
     return cancelCreation(request);
   }
 };
 
-const listCategories = (request) => {
-  const categories = load(request.message.chat.id).categories;
+const listCategories = async (request) => {
+  const categories = (await load(request.message.chat.id)).categories;
 
   if (!categories?.length) {
     request.answer = {
@@ -48,9 +51,10 @@ const listCategories = (request) => {
   }
 };
 
-export const onCreateCallback = (request) => {
+export const onCreateCallback = async (request) => {
   const chatId = request.callbackQuery.message.chat.id;
-  save(chatId, Object.assign(load(chatId) || {}, { state: STATES.waitingForCategoryName }));
+  const userData = (await load(chatId)) || {};
+  await save(chatId, Object.assign(userData, { state: STATES.waitingForCategoryName }));
   request.answer = {
     method: 'sendMessage',
     chat_id: request.callbackQuery.message.chat.id,
@@ -61,13 +65,13 @@ export const onCreateCallback = (request) => {
   };
 };
 
-export const createCategory = (request) => {
+export const createCategory = async (request) => {
   const categoryName = request.message.text.split(`\n`)[0].trim();
   let categoryDescription = '';
   if (request.message.text.indexOf('\n') !== -1) {
     categoryDescription = request.message.text.slice(request.message.text.indexOf('\n')).trim();
   }
-  const userData = load(request.message.chat.id);
+  const userData = await load(request.message.chat.id);
   if (!userData.categories) userData.categories = [];
   if (userData.categories.find((c) => c.name == categoryName)) {
     return (request.answer = {
@@ -80,7 +84,7 @@ export const createCategory = (request) => {
     });
   } else {
     userData.categories.push({ name: categoryName, description: categoryDescription, cards: [] });
-    save(request.message.chat.id, userData);
+    await save(request.message.chat.id, userData);
     return (request.answer = {
       method: 'sendMessage',
       chat_id: request.message.chat.id,
@@ -89,7 +93,8 @@ export const createCategory = (request) => {
   }
 };
 
-export const cancelCreation = (request) => {
+export const cancelCreation = async (request) => {
   const chatId = request.callbackQuery.message.chat.id;
-  save(chatId, Object.assign(load(chatId) || {}, { state: null }));
+  const userData = (await load(chatId)) || {};
+  await save(chatId, Object.assign(userData, { state: null }));
 };
