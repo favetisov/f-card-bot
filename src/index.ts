@@ -3,6 +3,7 @@ import { WebhookRequest } from './models/webhook-request';
 import { Middleware } from './models/middleware';
 import { categoryMiddleware } from './middleware/category.middleware';
 import { DocumentReference, Firestore } from '@google-cloud/firestore';
+import { environment } from './environments/environment';
 
 const middlewareChain: Middleware[] = [pingMiddleware, categoryMiddleware];
 
@@ -14,11 +15,15 @@ export const onmessage = async (req, res) => {
   const request = new WebhookRequest();
   request.message = req.body.message;
   request.callbackQuery = req.body.callback_query;
+  setBotRequest(request);
   await setUserData(request);
 
   for (let run of middlewareChain) {
     await run(request);
   }
+
+  /** debug */
+  await request.botRequest('sendMessage', { chatId: request.message?.chat.id, text: 'feeling good' });
 
   /** remove this after deployment is completed */
   if (!request.answer) {
@@ -48,4 +53,15 @@ const setUserData = async (request: WebhookRequest): Promise<DocumentReference> 
     await collection.doc(key).set({ state: '', categories: [] });
     return collection.doc(key);
   }
+};
+
+const setBotRequest = (request: WebhookRequest) => {
+  request.botRequest = async (method, params) => {
+    const response = await fetch(`https://api.telegram.org/bot${environment.botToken}/${method}`, {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return response.json();
+  };
 };

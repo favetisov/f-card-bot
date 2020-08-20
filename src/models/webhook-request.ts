@@ -18,4 +18,5 @@ export class WebhookRequest {
   callbackQuery?: CallbackQuery;
   answer: NullAnswer | SendMessageAnswer;
   userData: any;
+  botRequest: (method: string, params: any) => Promise<any>;
 }
