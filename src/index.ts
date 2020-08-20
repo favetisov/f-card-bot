@@ -4,6 +4,7 @@ import { Middleware } from './models/middleware';
 import { categoryMiddleware } from './middleware/category.middleware';
 import { DocumentReference, Firestore } from '@google-cloud/firestore';
 import { environment } from './environments/environment';
+const fetch = require('node-fetch');
 
 const middlewareChain: Middleware[] = [pingMiddleware, categoryMiddleware];
 

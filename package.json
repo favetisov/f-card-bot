@@ -42,6 +42,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^4.2.0"
+    "@google-cloud/firestore": "^4.2.0",
+    "node-fetch": "^2.6.0"
   }
 }
