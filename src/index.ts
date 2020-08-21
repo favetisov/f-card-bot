@@ -19,10 +19,6 @@ export const onmessage = async (req, res) => {
   setBotRequest(request);
   await setUserData(request);
 
-  for (let run of middlewareChain) {
-    await run(request);
-  }
-
   /** debug */
   const response = await request.botRequest('sendMessage', {
     chat_id: request.message?.chat.id,
@@ -34,17 +30,21 @@ export const onmessage = async (req, res) => {
       JSON.stringify(request.callbackQuery),
   });
 
-  /** remove this after deployment is completed */
-  if (!request.answer) {
-    console.log('body', JSON.stringify(req.body));
-    console.log('from', JSON.stringify(req.body.from));
-    console.log('message', JSON.stringify(req.body.message));
-    request.answer = {
-      method: 'sendMessage',
-      text: JSON.stringify(req.body),
-      chat_id: req.body?.from?.chat?.id,
-    };
+  for (let run of middlewareChain) {
+    await run(request);
   }
+
+  // /** remove this after deployment is completed */
+  // if (!request.answer) {
+  //   console.log('body', JSON.stringify(req.body));
+  //   console.log('from', JSON.stringify(req.body.from));
+  //   console.log('message', JSON.stringify(req.body.message));
+  //   request.answer = {
+  //     method: 'sendMessage',
+  //     text: JSON.stringify(req.body),
+  //     chat_id: req.body?.from?.chat?.id,
+  //   };
+  // }
 
   if (!request.answer) {
     throw new Error('No answer was assigned to request');
