@@ -23,6 +23,7 @@ export const onmessage = async (req, res) => {
   const response = await request.botRequest('sendMessage', {
     chat_id: request.message?.chat.id,
     text:
+      `i'm updated function\n\n` +
       JSON.stringify(await request.userData.get('state')) +
       `\n\n` +
       JSON.stringify(request.message) +
