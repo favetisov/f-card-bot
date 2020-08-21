@@ -55,6 +55,7 @@ const listCategories = async (request) => {
       method: 'sendMessage',
       chat_id: request.message.chat.id,
       text,
+      parse_mode: 'MarkdownV2',
       reply_markup: {
         inline_keyboard: [
           ...categories.map((c) => [{ text: 'select ' + c.name, callback_data: COMMANDS.selectCategory + c.name }]),
@@ -114,6 +115,7 @@ export const createCategory = async (request) => {
       ],
     });
   } else {
+    categories.forEach((c) => (c.selected = false));
     categories.push({ name: categoryName, description: categoryDescription, cards: [], selected: true });
     const hangingMessages = (await request.userData.get()).data().hangingMessages;
     for (const msg of hangingMessages.filter((t) =>

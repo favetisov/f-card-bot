@@ -156,4 +156,6 @@ test('list created categories', async () => {
   expect(request.answer).toHaveProperty('text');
   const text = request.answer['text'];
   expect(text.includes('Test') && text.includes('Second') && text.includes('Description')).toBe(true);
+  expect(request.userData.data.categories.filter((c) => c.selected)).toHaveLength(1);
+  expect(request.userData.data.categories.find((c) => c.selected).name).toBe('Second');
 });
