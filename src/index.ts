@@ -24,8 +24,10 @@ export const onmessage = async (req, res) => {
   }
 
   /** debug */
-  const response = await request.botRequest('sendMessage', { chat_id: request.message?.chat.id, text: 'feeling good' });
-  console.log(response);
+  const response = await request.botRequest('sendMessage', {
+    chat_id: request.message?.chat.id,
+    text: request.message ? JSON.stringify(request.message) : JSON.stringify(request.callbackQuery),
+  });
 
   /** remove this after deployment is completed */
   if (!request.answer) {
@@ -49,10 +51,10 @@ export const onmessage = async (req, res) => {
 const setUserData = async (request: WebhookRequest): Promise<DocumentReference> => {
   const key = 'chat_' + (request.message?.chat.id || request.callbackQuery?.message.chat.id);
   request.userData = await collection.doc(key);
-  if (request.userData) {
+  if ((await request.userData.get('state')).exists) {
     return request.userData;
   } else {
-    await collection.doc(key).set({ state: '', categories: [] });
+    await collection.doc(key).set({ state: '', categories: [], hangingMessages: [] });
     return collection.doc(key);
   }
 };
