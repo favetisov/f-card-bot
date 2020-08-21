@@ -22,10 +22,10 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
     return listCategories(request);
   } else if (request.callbackQuery?.data == COMMANDS.create) {
     return onCreateCallback(request);
-  } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get('state'))) {
-    return createCategory(request);
   } else if (request.callbackQuery?.data == COMMANDS.cancelCreation) {
     return cancelCreation(request);
+  } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get('state'))) {
+    return createCategory(request);
   }
 };
 
