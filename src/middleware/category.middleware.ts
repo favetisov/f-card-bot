@@ -3,6 +3,7 @@ import { WebhookRequest } from '../models/webhook-request';
 const COMMANDS = {
   create: 'cmd_create_category',
   cancelCreation: 'cmd_create_category_cancel',
+  selectCategory: 'cmd_select_category_',
 };
 
 const STATES = {
@@ -41,12 +42,24 @@ const listCategories = async (request) => {
       },
     };
   } else {
+    let text = `You have following categories:\n`;
+    for (const c of categories) {
+      if (c.selected) text += '*';
+      text += c.name;
+      if (c.selected) text += '*';
+      text += `\n`;
+      if (c.description) text += c.description + `\n`;
+    }
+
     request.answer = {
       method: 'sendMessage',
       chat_id: request.message.chat.id,
-      text: categories.map((c) => c.name + (c.description ? `\n` + c.description : '')).join(`\n`),
+      text,
       reply_markup: {
-        inline_keyboard: [[{ text: 'create new category', callback_data: COMMANDS.create }]],
+        inline_keyboard: [
+          ...categories.map((c) => [{ text: 'select ' + c.name, callback_data: COMMANDS.selectCategory + c.name }]),
+          [{ text: 'create new category', callback_data: COMMANDS.create }],
+        ],
       },
     };
   }
@@ -56,6 +69,10 @@ export const onCreateCallback = async (request) => {
   await request.botRequest('deleteMessage', {
     chat_id: request.callbackQuery.message.chat.id,
     message_id: request.callbackQuery.message.id,
+  });
+
+  await request.botRequest('answerCallbackQuery', {
+    callback_query_id: request.callbackQuery.id,
   });
 
   const { result } = await request.botRequest('sendMessage', {
@@ -127,6 +144,10 @@ export const cancelCreation = async (request) => {
       message_id: msg.id,
     });
   }
+
+  await request.botRequest('answerCallbackQuery', {
+    callback_query_id: request.callbackQuery.id,
+  });
 
   await request.userData.update({
     state: '',

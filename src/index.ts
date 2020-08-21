@@ -26,7 +26,10 @@ export const onmessage = async (req, res) => {
   /** debug */
   const response = await request.botRequest('sendMessage', {
     chat_id: request.message?.chat.id,
-    text: request.message ? JSON.stringify(request.message) : JSON.stringify(request.callbackQuery),
+    text:
+      JSON.stringify(await request.userData.get()) +
+      `\n\n` +
+      (request.message ? JSON.stringify(request.message) : JSON.stringify(request.callbackQuery)),
   });
 
   /** remove this after deployment is completed */

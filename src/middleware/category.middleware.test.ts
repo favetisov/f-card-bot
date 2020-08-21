@@ -36,7 +36,7 @@ test('get empty list', async () => {
 
 test('start category creation', async () => {
   const request = new WebhookRequest();
-  request.callbackQuery = { message: { id: 1, chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
+  request.callbackQuery = { id: 1, message: { id: 1, chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
   const botCallsLog: any = [];
   request.botRequest = botRequestMock(botCallsLog);
   request.userData = userDataMock;
@@ -45,6 +45,8 @@ test('start category creation', async () => {
   expect(botCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(1);
   /** sending "provide category name" message */
   expect(botCallsLog.filter((l) => l.method == 'sendMessage')).toHaveLength(1);
+  /** mark query as executed */
+  expect(botCallsLog.filter((l) => l.method == 'answerCallbackQuery')).toHaveLength(1);
   expect(request.userData).toHaveProperty('state', 'waiting_for_category_name');
   expect(request.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(1);
 });
@@ -55,16 +57,19 @@ test('cancel category creation', async () => {
   const botCallsLog: any = [];
   request.botRequest = botRequestMock(botCallsLog);
   expect(request.userData).toHaveProperty('state', 'waiting_for_category_name');
-  request.callbackQuery = { message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category_cancel' };
+  request.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category_cancel' };
   await categoryMiddleware(request);
+  /** deleting 'provide category name' message and reseting state */
   expect(botCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(1);
   expect(request.userData).not.toHaveProperty('state', 'waiting_for_category_name');
   expect(request.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
+  /** mark query as executed */
+  expect(botCallsLog.filter((l) => l.method == 'answerCallbackQuery')).toHaveLength(1);
 });
 
 test('create category', async () => {
   const initRequest = new WebhookRequest();
-  initRequest.callbackQuery = { message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
+  initRequest.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
   initRequest.userData = userDataMock;
   initRequest.botRequest = botRequestMock([]);
   await categoryMiddleware(initRequest);
@@ -88,7 +93,7 @@ test('create category', async () => {
 
 test('trying to create category with existing name', async () => {
   const initRequest = new WebhookRequest();
-  initRequest.callbackQuery = { message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
+  initRequest.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
   initRequest.userData = userDataMock;
   initRequest.botRequest = botRequestMock([]);
   expect(initRequest.userData.categories.length).toEqual(1);
@@ -119,28 +124,30 @@ test('trying to create category with existing name', async () => {
   expect(successRequest.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
   expect(succBotCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(2);
 });
-//
-// test('create category with description', async () => {
-//   const initRequest = new WebhookRequest();
-//   initRequest.callbackQuery = { message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
-//   initRequest.userData = userDataMock;
-//   await categoryMiddleware(initRequest);
-//   const nameRequest = new WebhookRequest();
-//   nameRequest.message = { chat: { id: CHAT_ID }, text: `Second\n Description ` };
-//   nameRequest.userData = userDataMock;
-//   await categoryMiddleware(nameRequest);
-//   expect(nameRequest.userData).toHaveProperty('categories');
-//   expect(nameRequest.userData.categories.find((c) => c.description === 'Description')).not.toEqual(null);
-// });
-//
-// test('list created categories', async () => {
-//   const request = new WebhookRequest();
-//   request.message = { chat: { id: CHAT_ID }, text: '/list' };
-//   request.userData = userDataMock;
-//   await categoryMiddleware(request);
-//   expect(request).toHaveProperty('answer');
-//   expect(request.answer).toHaveProperty('method', 'sendMessage');
-//   expect(request.answer).toHaveProperty('text');
-//   const text = request.answer['text'];
-//   expect(text.includes('Test') && text.includes('Second') && text.includes('Description')).toBe(true);
-// });
+
+test('create category with description', async () => {
+  const initRequest = new WebhookRequest();
+  initRequest.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
+  initRequest.userData = userDataMock;
+  initRequest.botRequest = botRequestMock([]);
+  await categoryMiddleware(initRequest);
+  const nameRequest = new WebhookRequest();
+  nameRequest.message = { chat: { id: CHAT_ID }, text: `Second\n Description ` };
+  nameRequest.userData = userDataMock;
+  nameRequest.botRequest = botRequestMock([]);
+  await categoryMiddleware(nameRequest);
+  expect(nameRequest.userData).toHaveProperty('categories');
+  expect(nameRequest.userData.categories.find((c) => c.description === 'Description')).not.toEqual(null);
+});
+
+test('list created categories', async () => {
+  const request = new WebhookRequest();
+  request.message = { chat: { id: CHAT_ID }, text: '/list' };
+  request.userData = userDataMock;
+  await categoryMiddleware(request);
+  expect(request).toHaveProperty('answer');
+  expect(request.answer).toHaveProperty('method', 'sendMessage');
+  expect(request.answer).toHaveProperty('text');
+  const text = request.answer['text'];
+  expect(text.includes('Test') && text.includes('Second') && text.includes('Description')).toBe(true);
+});
