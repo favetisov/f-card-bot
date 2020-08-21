@@ -178,7 +178,7 @@ export const sendCategorySelectedMessage = async (request, chatId) => {
     chat_id: chatId,
     text: `Current category is *${
       categories.find((c) => c.selected).name
-    }*. Send \`/list\ to get full list and select/add category, use buttons below for further actions`,
+    }*. Send \`/list\` to get full list and select/add category, use buttons below for further actions`,
     parse_mode: 'MarkdownV2',
   });
   return request.botRequest('pinChatMessage', {
