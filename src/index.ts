@@ -23,7 +23,7 @@ export const onmessage = async (req, res) => {
   const response = await request.botRequest('sendMessage', {
     chat_id: request.message?.chat.id,
     text:
-      `i'm updated function4\n\n` +
+      `i'm updated function5\n\n` +
       JSON.stringify((await request.userData.get()).data().state) +
       `\n\n` +
       JSON.stringify(request.message) +
@@ -54,14 +54,12 @@ export const onmessage = async (req, res) => {
   res.send(request.answer);
 };
 
-const setUserData = async (request: WebhookRequest): Promise<DocumentReference> => {
+const setUserData = async (request: WebhookRequest) => {
   const key = 'chat_' + (request.message?.chat.id || request.callbackQuery?.message.chat.id);
   request.userData = await collection.doc(key);
-  if ((await request.userData.get('state')).exists) {
-    return request.userData;
-  } else {
+  if ((await request.userData.get()).data().state === undefined) {
     await collection.doc(key).set({ state: '', categories: [], hangingMessages: [] });
-    return collection.doc(key);
+    request.userData = await collection.doc(key);
   }
 };
 
