@@ -20,17 +20,17 @@ export const onmessage = async (req, res) => {
   setBotRequest(request);
   await setUserData(request);
 
-  /** debug */
-  const response = await request.botRequest('sendMessage', {
-    chat_id: request.message?.chat.id || request.callbackQuery?.message.chat.id,
-    text:
-      `i'm updated function5\n\n` +
-      JSON.stringify((await request.userData.get()).data().state) +
-      `\n\n` +
-      JSON.stringify(request.message) +
-      `\n\n` +
-      JSON.stringify(request.callbackQuery),
-  });
+  // /** debug */
+  // const response = await request.botRequest('sendMessage', {
+  //   chat_id: request.message?.chat.id || request.callbackQuery?.message.chat.id,
+  //   text:
+  //     `i'm updated function5\n\n` +
+  //     JSON.stringify((await request.userData.get()).data().state) +
+  //     `\n\n` +
+  //     JSON.stringify(request.message) +
+  //     `\n\n` +
+  //     JSON.stringify(request.callbackQuery),
+  // });
 
   for (let run of middlewareChain) {
     await run(request);

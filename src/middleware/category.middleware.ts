@@ -26,6 +26,8 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
     return cancelCreation(request);
   } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get()).data().state) {
     return createCategory(request);
+  } else if (request.callbackQuery?.data?.indexOf(COMMANDS.selectCategory) === 0) {
+    return selectCategory(request);
   }
 };
 
@@ -157,6 +159,17 @@ export const cancelCreation = async (request) => {
       (t) => ![MSG_TYPES.nameExists, MSG_TYPES.provideCategory].includes(t.type),
     ),
   });
+};
+
+export const selectCategory = async (request) => {
+  const categories = (await request.userData.get()).data().categories;
+  const categoryName = request.callbackQuery.data.split(COMMANDS.selectCategory)[1];
+  if (!categories.some((c) => c.name == categoryName)) return;
+
+  categories.forEach((c) => (c.selected = c.name === categoryName));
+  await request.userData.update({ categories });
+  await request.botRequest('answerCallbackQuery', { callback_query_id: request.callbackQuery.id });
+  return sendCategorySelectedMessage(request, request.callbackQuery.message.chat.id);
 };
 
 export const sendCategorySelectedMessage = async (request, chatId) => {

@@ -159,3 +159,21 @@ test('list created categories', async () => {
   expect(request.userData.data.categories.filter((c) => c.selected)).toHaveLength(1);
   expect(request.userData.data.categories.find((c) => c.selected).name).toBe('Second');
 });
+
+test('select category', async () => {
+  const request = new WebhookRequest();
+  request.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_select_category_Test' };
+  request.userData = userDataMock;
+  const botCallsLog: any = [];
+  request.botRequest = botRequestMock(botCallsLog);
+  await categoryMiddleware(request);
+  /** mark query as executed */
+  expect(botCallsLog.filter((l) => l.method == 'answerCallbackQuery')).toHaveLength(1);
+  /** "category selected" message should be sent and pinned" */
+  expect(botCallsLog.filter((l) => l.method == 'sendMessage')).toHaveLength(1);
+  expect(botCallsLog.filter((l) => l.method == 'pinChatMessage')).toHaveLength(1);
+
+  /** desired category is selected (others are not */
+  expect(request.userData.data.categories.find((c) => c.selected).name).toBe('Test');
+  expect(request.userData.data.categories.filter((c) => c.selected)).toHaveLength(1);
+});
