@@ -24,13 +24,13 @@ export const categoryMiddleware = async (request: WebhookRequest) => {
     return onCreateCallback(request);
   } else if (request.callbackQuery?.data == COMMANDS.cancelCreation) {
     return cancelCreation(request);
-  } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get('state'))) {
+  } else if (request.message?.text && STATES.waitingForCategoryName === (await request.userData.get()).data().state) {
     return createCategory(request);
   }
 };
 
 const listCategories = async (request) => {
-  const categories = await request.userData.get('categories');
+  const categories = (await request.userData.get()).data().categories;
 
   if (!categories?.length) {
     request.answer = {
@@ -86,7 +86,7 @@ export const onCreateCallback = async (request) => {
   return request.userData.update({
     state: STATES.waitingForCategoryName,
     hangingMessages: [
-      ...((await request.userData.get('hangingMessages')) || []),
+      ...((await request.userData.get()).data().hangingMessages || []),
       { id: result.message_id, type: MSG_TYPES.provideCategory },
     ],
   });
@@ -98,7 +98,7 @@ export const createCategory = async (request) => {
   if (request.message.text.indexOf('\n') !== -1) {
     categoryDescription = request.message.text.slice(request.message.text.indexOf('\n')).trim();
   }
-  const categories = await request.userData.get('categories');
+  const categories = (await request.userData.get()).data().categories;
   if (categories.find((c) => c.name == categoryName)) {
     const { result } = await request.botRequest('sendMessage', {
       chat_id: request.message.chat.id,
@@ -109,13 +109,13 @@ export const createCategory = async (request) => {
     });
     return request.userData.update({
       hangingMessages: [
-        ...(await request.userData.get('hangingMessages')),
+        ...(await request.userData.get()).data().hangingMessages,
         { id: result.message_id, type: MSG_TYPES.nameExists },
       ],
     });
   } else {
     categories.push({ name: categoryName, description: categoryDescription, cards: [], selected: true });
-    const hangingMessages = await request.userData.get('hangingMessages');
+    const hangingMessages = (await request.userData.get()).data().hangingMessages;
     for (const msg of hangingMessages.filter((t) =>
       [MSG_TYPES.nameExists, MSG_TYPES.provideCategory].includes(t.type),
     )) {
@@ -137,7 +137,7 @@ export const createCategory = async (request) => {
 };
 
 export const cancelCreation = async (request) => {
-  const hangingMessages = await request.userData.get('hangingMessages');
+  const hangingMessages = (await request.userData.get()).data().hangingMessages;
   for (const msg of hangingMessages.filter((t) => [MSG_TYPES.nameExists, MSG_TYPES.provideCategory].includes(t.type))) {
     await request.botRequest('deleteMessage', {
       chat_id: request.callbackQuery.message.chat.id,
@@ -151,14 +151,14 @@ export const cancelCreation = async (request) => {
 
   await request.userData.update({
     state: '',
-    hangingMessages: ((await request.userData.get('hangingMessages')) || []).filter(
+    hangingMessages: ((await request.userData.get()).data().hangingMessages || []).filter(
       (t) => ![MSG_TYPES.nameExists, MSG_TYPES.provideCategory].includes(t.type),
     ),
   });
 };
 
 export const sendCategorySelectedMessage = async (request, chatId) => {
-  const categories = await request.userData.get('categories');
+  const categories = (await request.userData.get()).data().categories;
   const { result } = await request.botRequest('sendMessage', {
     chat_id: chatId,
     text: `Current category is *${

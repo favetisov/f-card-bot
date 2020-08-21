@@ -5,15 +5,20 @@ import { Category } from '../models/category';
 const CHAT_ID = 1;
 
 class UserDataMock {
-  state = '';
-  categories: Category[] = [];
+  data = {
+    state: '',
+    categories: <Category[]>[],
+  };
+
   async update(data) {
     for (const key in data) {
-      this[key] = data[key];
+      this.data[key] = data[key];
     }
   }
-  async get(key) {
-    return this[key];
+  async get() {
+    return {
+      data: () => this.data,
+    };
   }
 }
 const userDataMock = new UserDataMock();
@@ -28,6 +33,7 @@ test('get empty list', async () => {
   request.message = { chat: { id: CHAT_ID }, text: '/list' };
   request.userData = userDataMock;
   await categoryMiddleware(request);
+  expect(request).toHaveProperty('answer');
   expect(request).toHaveProperty('answer');
   expect(request.answer).toHaveProperty('method', 'sendMessage');
   expect(request.answer).toHaveProperty('reply_markup');
@@ -47,8 +53,8 @@ test('start category creation', async () => {
   expect(botCallsLog.filter((l) => l.method == 'sendMessage')).toHaveLength(1);
   /** mark query as executed */
   expect(botCallsLog.filter((l) => l.method == 'answerCallbackQuery')).toHaveLength(1);
-  expect(request.userData).toHaveProperty('state', 'waiting_for_category_name');
-  expect(request.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(1);
+  expect(request.userData.data).toHaveProperty('state', 'waiting_for_category_name');
+  expect(request.userData.data.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(1);
 });
 
 test('cancel category creation', async () => {
@@ -56,13 +62,13 @@ test('cancel category creation', async () => {
   request.userData = userDataMock;
   const botCallsLog: any = [];
   request.botRequest = botRequestMock(botCallsLog);
-  expect(request.userData).toHaveProperty('state', 'waiting_for_category_name');
+  expect(request.userData.data).toHaveProperty('state', 'waiting_for_category_name');
   request.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category_cancel' };
   await categoryMiddleware(request);
   /** deleting 'provide category name' message and reseting state */
   expect(botCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(1);
-  expect(request.userData).not.toHaveProperty('state', 'waiting_for_category_name');
-  expect(request.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
+  expect(request.userData.data).not.toHaveProperty('state', 'waiting_for_category_name');
+  expect(request.userData.data.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
   /** mark query as executed */
   expect(botCallsLog.filter((l) => l.method == 'answerCallbackQuery')).toHaveLength(1);
 });
@@ -79,13 +85,13 @@ test('create category', async () => {
   const botCallsLog: any = [];
   nameRequest.botRequest = botRequestMock(botCallsLog);
   await categoryMiddleware(nameRequest);
-  expect(nameRequest.userData).toHaveProperty('categories');
-  expect(nameRequest.userData.categories.find((c) => c.name == 'Test')).not.toEqual(null);
-  expect(nameRequest.userData).not.toHaveProperty('state', 'waiting_for_category_name');
-  expect(nameRequest.userData.provideCategoryNameMessageId).toBe(undefined);
+  expect(nameRequest.userData.data).toHaveProperty('categories');
+  expect(nameRequest.userData.data.categories.find((c) => c.name == 'Test')).not.toEqual(null);
+  expect(nameRequest.userData.data).not.toHaveProperty('state', 'waiting_for_category_name');
+  expect(nameRequest.userData.data.provideCategoryNameMessageId).toBe(undefined);
   /** deleting "provide category name" message */
   expect(botCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(1);
-  expect(nameRequest.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
+  expect(nameRequest.userData.data.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
   /** sending and pinning message with current category */
   expect(botCallsLog.filter((l) => l.method == 'sendMessage')).toHaveLength(1);
   expect(botCallsLog.filter((l) => l.method == 'pinChatMessage')).toHaveLength(1);
@@ -96,7 +102,7 @@ test('trying to create category with existing name', async () => {
   initRequest.callbackQuery = { id: 1, message: { chat: { id: CHAT_ID } }, data: 'cmd_create_category' };
   initRequest.userData = userDataMock;
   initRequest.botRequest = botRequestMock([]);
-  expect(initRequest.userData.categories.length).toEqual(1);
+  expect(initRequest.userData.data.categories.length).toEqual(1);
   await categoryMiddleware(initRequest);
   const nameRequest = new WebhookRequest();
   nameRequest.message = { chat: { id: CHAT_ID }, text: 'Test' };
@@ -104,14 +110,14 @@ test('trying to create category with existing name', async () => {
   const botCallsLog: any = [];
   nameRequest.botRequest = botRequestMock(botCallsLog);
   await categoryMiddleware(nameRequest);
-  expect(nameRequest.userData.categories.length).toEqual(1);
+  expect(nameRequest.userData.data.categories.length).toEqual(1);
 
   /** sending "category exists" message and adding it's id to userData */
   expect(botCallsLog.filter((l) => l.method == 'sendMessage')).toHaveLength(1);
-  expect(nameRequest.userData.hangingMessages.filter((m) => m.type === 'name_exists')).toHaveLength(1);
+  expect(nameRequest.userData.data.hangingMessages.filter((m) => m.type === 'name_exists')).toHaveLength(1);
 
   /** provide category message should stay */
-  expect(nameRequest.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(1);
+  expect(nameRequest.userData.data.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(1);
 
   const successRequest = new WebhookRequest();
   successRequest.message = { chat: { id: CHAT_ID }, text: 'New Name' };
@@ -120,8 +126,8 @@ test('trying to create category with existing name', async () => {
   successRequest.botRequest = botRequestMock(succBotCallsLog);
   await categoryMiddleware(successRequest);
   /** hanging messages should be deleted */
-  expect(successRequest.userData.hangingMessages.filter((m) => m.type === 'name_exists')).toHaveLength(0);
-  expect(successRequest.userData.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
+  expect(successRequest.userData.data.hangingMessages.filter((m) => m.type === 'name_exists')).toHaveLength(0);
+  expect(successRequest.userData.data.hangingMessages.filter((m) => m.type === 'provide_category')).toHaveLength(0);
   expect(succBotCallsLog.filter((l) => l.method == 'deleteMessage')).toHaveLength(2);
 });
 
@@ -136,8 +142,8 @@ test('create category with description', async () => {
   nameRequest.userData = userDataMock;
   nameRequest.botRequest = botRequestMock([]);
   await categoryMiddleware(nameRequest);
-  expect(nameRequest.userData).toHaveProperty('categories');
-  expect(nameRequest.userData.categories.find((c) => c.description === 'Description')).not.toEqual(null);
+  expect(nameRequest.userData.data).toHaveProperty('categories');
+  expect(nameRequest.userData.data.categories.find((c) => c.description === 'Description')).not.toEqual(null);
 });
 
 test('list created categories', async () => {
