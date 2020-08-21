@@ -4,9 +4,10 @@ import { Middleware } from './models/middleware';
 import { categoryMiddleware } from './middleware/category.middleware';
 import { DocumentReference, Firestore } from '@google-cloud/firestore';
 import { environment } from './environments/environment';
+import { noResponseMiddleware } from './middleware/no-response.middleware';
 const fetch = require('node-fetch');
 
-const middlewareChain: Middleware[] = [pingMiddleware, categoryMiddleware];
+const middlewareChain: Middleware[] = [pingMiddleware, categoryMiddleware, noResponseMiddleware];
 
 const collection = new Firestore({
   projectId: 'f-cards-bot',
