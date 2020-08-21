@@ -68,7 +68,7 @@ const listCategories = async (request) => {
 export const onCreateCallback = async (request) => {
   await request.botRequest('deleteMessage', {
     chat_id: request.callbackQuery.message.chat.id,
-    message_id: request.callbackQuery.message.id,
+    message_id: request.callbackQuery.message.message_id,
   });
 
   await request.botRequest('answerCallbackQuery', {
