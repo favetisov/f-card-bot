@@ -1,7 +1,7 @@
-import { Message } from './message';
+import { Chat } from './chat';
 
 export interface CallbackQuery {
   id: number;
-  message: Message;
+  message: { message_id: number; chat: Chat };
   data: string;
 }

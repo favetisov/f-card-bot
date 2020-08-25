@@ -35,14 +35,13 @@ const listCategories = async (request) => {
   const categories = (await request.userData.get()).data().categories;
 
   if (!categories?.length) {
-    request.answer = {
-      method: 'sendMessage',
+    await request.botRequest('sendMessage', {
       chat_id: request.message.chat.id,
       text: "You don't have any category yet. Click `create` to add category",
       reply_markup: {
         inline_keyboard: [[{ text: 'create new category', callback_data: COMMANDS.create }]],
       },
-    };
+    });
   } else {
     let text = `You have following categories:\n`;
     for (const c of categories) {
@@ -53,8 +52,7 @@ const listCategories = async (request) => {
       if (c.description) text += c.description + `\n`;
     }
 
-    request.answer = {
-      method: 'sendMessage',
+    await request.botRequest('sendMessage', {
       chat_id: request.message.chat.id,
       text,
       parse_mode: 'MarkdownV2',
@@ -64,7 +62,7 @@ const listCategories = async (request) => {
           [{ text: 'create new category', callback_data: COMMANDS.create }],
         ],
       },
-    };
+    });
   }
 };
 
@@ -178,7 +176,7 @@ export const sendCategorySelectedMessage = async (request, chatId) => {
     chat_id: chatId,
     text: `Current category is *${
       categories.find((c) => c.selected).name
-    }*. Send \`/list\` to get full list and select/add category, use buttons below for further actions`,
+    }*\\. Send \`/list\` to get full list and select/add category, use buttons below for further actions`,
     parse_mode: 'MarkdownV2',
   });
   return request.botRequest('pinChatMessage', {

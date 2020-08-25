@@ -72,6 +72,8 @@ const setBotRequest = (request: WebhookRequest) => {
       headers: { 'Content-Type': 'application/json' },
     });
     console.log(`https://api.telegram.org/bot${environment.botToken}/${method}`, params);
-    return response.json();
+    const resp = response.json();
+    console.log(resp);
+    return resp;
   };
 };
