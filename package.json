@@ -34,10 +34,15 @@
     "jest": "^26.2.1",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
+    "replace-in-file": "^6.1.0",
     "rimraf": "^3.0.2",
     "semver": "^7.3.2",
     "simple-git": "^2.15.0",
     "ts-jest": "^26.1.4",
     "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^4.2.0",
+    "node-fetch": "^2.6.0"
   }
 }

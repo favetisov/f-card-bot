@@ -1,9 +1,11 @@
 name: Deploy on production
 
-on:
-  push:
-    tags:
-      - '*'
+#on:
+#  push:
+#    tags:
+#      - '*'
+
+on: push
 
 jobs:
   build:
@@ -32,3 +34,6 @@ jobs:
         with:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
       - run: npm run deploy
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+
