@@ -1,9 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
-import { Category } from '../models/category';
-import { Message } from '../models/message';
-import { CallbackQuery } from '../models/callback-query';
-import { WebhookRequest } from '../models/webhook-request';
-
+import { Request } from '../models/request';
+import { STATE } from '../tools/states';
+import { LANGUAGE } from '../tools/language';
 const fetch = require('node-fetch');
 
 /**
@@ -28,27 +26,21 @@ const fetch = require('node-fetch');
  *  TO ENABLE TESTING USING ACTUAL FIRESTORE CALLS:
  *    1. not implemented yet :(
  */
-export class RequestMock extends WebhookRequest {
-  message?: Message;
-  callbackQuery?: CallbackQuery;
-
+export class RequestMock extends Request {
   env: { BOT_TOKEN?: string; CHAT_ID: number } = this.getEnv();
 
-  userData = {
-    data: {
-      state: '',
-      categories: <Category[]>[],
-      hangingMessages: <Array<{ id: number; type: string }>>[],
-    },
-    async update(data) {
+  user: any = {
+    update: function (data) {
       for (const key in data) {
         this.data[key] = data[key];
       }
     },
-    async get() {
-      return {
-        data: () => this.data,
-      };
+    data: {
+      language: LANGUAGE.ru,
+      state: STATE.ready,
+      tutorialCompleted: true,
+      categories: [],
+      hangingMessages: [],
     },
   };
 
@@ -66,7 +58,7 @@ export class RequestMock extends WebhookRequest {
   }
 
   /** send request to bot. mocks request if BOT_TOKEN is not set in environment file */
-  botRequest = async (method: string, params: Object, expectFail = false): Promise<Object> => {
+  botRequest = async (method: string, params: Object): Promise<Object> => {
     let result: any = { ok: true };
     if (this.env.BOT_TOKEN) {
       const response = await fetch(`https://api.telegram.org/bot${this.env.BOT_TOKEN}/${method}`, {
@@ -75,7 +67,7 @@ export class RequestMock extends WebhookRequest {
         headers: { 'Content-Type': 'application/json' },
       });
       result = await response.json();
-      if (!expectFail && !result.ok) {
+      if (!result.ok) {
         console.error(
           'Bot call failed: ' +
             JSON.stringify(result) +

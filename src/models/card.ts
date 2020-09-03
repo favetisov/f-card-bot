@@ -1,7 +1,7 @@
 export interface Card {
   id: number;
-  title: string;
-  description: string;
-  answer: string;
-  attempts: any[];
+  question: { text?: string; caption?: string; photoId?: string; videoId?: string };
+  published: boolean;
+  answer: { text?: string; caption?: string; photoId?: string; videoId?: string } | null;
+  attempts: Array<{ timestamp: number; mark: number }>;
 }

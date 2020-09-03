@@ -1,7 +1,7 @@
 export enum Command {
-  useCategory =  '/use',
+  useCategory = '/use',
   addCard = '/add',
   getInfo = '/info',
   startLearning = '/learn',
-  stopLearning = '/stop'
+  stopLearning = '/stop',
 }
