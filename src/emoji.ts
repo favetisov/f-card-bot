@@ -906,6 +906,7 @@ export const emoji = {
   paperclip: '📎',
   straight_ruler: '📏',
   triangular_ruler: '📐',
+
   bookmark_tabs: '📑',
   ledger: '📒',
   notebook: '📓',

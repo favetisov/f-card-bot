@@ -4,7 +4,6 @@ import { i18n } from '../tools/i18n';
 import { STATE } from '../tools/states';
 import { MSG_TYPE } from '../tools/msg-type';
 import { StartController } from './start.controller';
-import { emoji } from '../emoji';
 
 export const CategoryController = {
   listCategories: async (request: Request) => {
@@ -22,22 +21,14 @@ export const CategoryController = {
         parse_mode: 'MarkdownV2',
       });
     } else {
-      let text = i18n.you_have_categories[request.user.data.language] + `\n`;
-      for (const c of categories) {
-        if (c.selected) text += '*';
-        text += c.name;
-        if (c.selected) text += '*';
-        text += `\n`;
-        if (c.description) text += c.description + `\n`;
-      }
-
+      let text = i18n.you_have_categories[request.user.data.language];
       await request.botRequest('sendMessage', {
         chat_id: request.chatId,
         text,
         parse_mode: 'MarkdownV2',
         reply_markup: {
           inline_keyboard: [
-            ...categories.map((c) => [{ text: 'select ' + c.name, callback_data: COMMANDS.selectCategory + c.name }]),
+            ...categories.map((c) => [{ text: c.name, callback_data: COMMANDS.selectCategory + c.name }]),
             [{ text: i18n.create_new_category[request.user.data.language], callback_data: COMMANDS.createCategory }],
           ],
         },
@@ -146,7 +137,7 @@ export const CategoryController = {
         ),
       });
       if (request.user.tutorialCompleted) {
-        await CategoryController.sendCategorySelectedMessage(request);
+        await CategoryController.getCurrentState(request);
       } else {
         await StartController.afterCategoryCreated(request);
       }
@@ -176,7 +167,8 @@ export const CategoryController = {
     categories.forEach((c) => (c.selected = c.name === categoryName));
     await request.user.update({ categories });
     await request.botRequest('answerCallbackQuery', { callback_query_id: request.callbackQuery.id });
-    return CategoryController.sendCategorySelectedMessage(request);
+    // return CategoryController.sendCategorySelectedMessage(request);
+    return CategoryController.getCurrentState(request);
   },
 
   getCurrentState: async (request) => {
@@ -188,14 +180,20 @@ export const CategoryController = {
 
     await request.botRequest('sendMessage', {
       chat_id: request.chatId,
-      text: `*${category.name}*\n_${category.description}_
-      
+      text: `*${category.name}*\n ${category.description ? '_' + category.description + '_\n' : ''}      
 unsolved: ${cardsLevels.filter((l) => l === -1).length}
 new: ${cardsLevels.filter((l) => l === 0).length}
 in progress: ${cardsLevels.filter((l) => l > 0 && l < 3).length}
 learned: ${cardsLevels.filter((l) => l > 3).length}
 `,
       parse_mode: 'MarkdownV2',
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: i18n.start_learning[request.user.data.language], callback_data: COMMANDS.startLearning }],
+          [{ text: i18n.add_card[request.user.data.language], callback_data: COMMANDS.changeCategory }],
+          [{ text: i18n.edit_category[request.user.data.language], callback_data: COMMANDS.changeCategory }],
+        ],
+      },
     });
   },
 };

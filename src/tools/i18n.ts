@@ -72,8 +72,8 @@ Let's create first category\\! Click button below to do so  ${emoji.point_down}
     ru: 'У вас пока нет ни одной категории\\. Нажмите кнопку под этим сообщением чтобы создать категорию',
   },
   create_new_category: {
-    en: 'Create new category',
-    ru: 'Создать категорию',
+    en: 'Create new category ' + emoji.heavy_plus_sign,
+    ru: 'Создать категорию ' + emoji.heavy_plus_sign,
   },
   provide_category_name: {
     en: 'Please provide category name. You can add optional description on a new line.',
@@ -94,8 +94,8 @@ Let's create first category\\! Click button below to do so  ${emoji.point_down}
       `Выбрана категория *${name}*\\. Напишите \`/list\` чтобы посмотреть список категорий; используйте кнопки внизу чтобы добавить карточки или изменить категорию`,
   },
   you_have_categories: {
-    en: 'You have following categories:',
-    ru: 'Доступны следующие категории:',
+    en: 'Select category ' + emoji.point_down,
+    ru: 'Выберите категорию ' + emoji.point_down,
   },
   provide_card_question: {
     en: '*Provide card question*\\.\nIt can be a text, image, video or anything of these combined\\.',
@@ -122,5 +122,17 @@ Let's create first category\\! Click button below to do so  ${emoji.point_down}
   answer_added: {
     en: `*Answer added* ${emoji.ok_hand}\n\n \`/add\` to create more cards\n \`/info\` to get current state \n\`/go\` to start learning`,
     ru: `*Ответ добавлен*\\. ${emoji.ok_hand}\n\n \`/add\` \\- добавить ещё карточек\n\ \`/info\` \\- текущий статус\n \`/go\` \\-  начать повторять`,
+  },
+  edit_category: {
+    en: 'Change category name/description  ' + emoji.pencil,
+    ru: 'Изменить название/описание  ' + emoji.pencil,
+  },
+  add_card: {
+    en: 'Add card  ' + emoji.heavy_plus_sign,
+    ru: 'Добавить карточку  ' + emoji.heavy_plus_sign,
+  },
+  start_learning: {
+    en: 'Start learning  ' + emoji.arrow_forward,
+    ru: 'Начать повторять  ' + emoji.arrow_forward,
   },
 };

@@ -27,6 +27,12 @@ export const route = async (request: Request): Promise<any> => {
       return LearnController.showAnswer(request);
     } else if (command.indexOf(COMMANDS.markAnswer) === 0) {
       return LearnController.markAnswer(request);
+    } else if (command === COMMANDS.startLearning) {
+      return LearnController.showCard(request);
+    } else if (command === COMMANDS.changeCategory) {
+      return CategoryController.listCategories(request);
+    } else if (command === COMMANDS.addCard) {
+      return CardController.onAddCard(request);
     }
   } else if (text) {
     if (text === '/ping') {
