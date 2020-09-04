@@ -11,4 +11,7 @@ export const COMMANDS = {
   markAnswer: 'cmd_mark_answer',
   startLearning: 'cmd_start_learning',
   addCard: 'cmd_add_card',
+  deleteCategory: 'cmd_delete_category',
+  deleteCategoryConfirm: 'cmd_delete_category_confirm',
+  deleteCategoryCancel: 'cmd_delete_category_cancel',
 };

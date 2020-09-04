@@ -84,7 +84,7 @@ describe('category controller', () => {
     request.callbackQuery = {
       id: 1, // sadly there is no way to emulate callback query so this will cause error in the console
       message: { message_id: 1, chat: { id: request.env.CHAT_ID } },
-      data: 'cmd_create_category',
+      data: COMMANDS.createCategory,
     };
     await route(request);
 
@@ -178,5 +178,69 @@ describe('category controller', () => {
     await route(request);
     /** sending info message */
     expect(request.countCalls('sendMessage')).toEqual(1);
+  });
+
+  test('removing category (but cancelling confirm)', async () => {
+    let sentMessages = request.requestLog.filter((m) => m.method === 'sendMessage');
+    const infoMessageId = sentMessages[sentMessages.length - 1].result.result.message_id;
+    request.callbackQuery = {
+      id: 1, // sadly there is no way to emulate callback query so this will cause error in the console
+      message: { message_id: infoMessageId, chat: { id: request.env.CHAT_ID } },
+      data: COMMANDS.deleteCategory,
+    };
+    await route(request);
+    /** confirm message should be sent */
+    expect(request.countCalls('sendMessage')).toEqual(1);
+    /** category info message should be deleted */
+    expect(request.countCalls('deleteMessage')).toEqual(1);
+
+    sentMessages = request.requestLog.filter((m) => m.method === 'sendMessage');
+    const confirmMessageId = sentMessages[sentMessages.length - 1].result.result.message_id;
+    request.refresh();
+    request.callbackQuery = {
+      id: 1, // sadly there is no way to emulate callback query so this will cause error in the console
+      message: { message_id: confirmMessageId, chat: { id: request.env.CHAT_ID } },
+      data: COMMANDS.deleteCategoryCancel,
+    };
+    await route(request);
+    /** confirm message should be deleted */
+    expect(request.countCalls('deleteMessage')).toEqual(1);
+    expect(request.user.data.hangingMessages.some((m) => m.type === MSG_TYPE.categoryRemovalConfirm)).toBe(true);
+    /** category not removed */
+    expect(request.user.data.categories.some((c) => c.name === 'Test')).toBe(true);
+  });
+
+  test('removing category (for good)', async () => {
+    request.message = { id: 1, chat: { id: request.env.CHAT_ID }, text: '/list' };
+    await route(request);
+    request.refresh();
+
+    let sentMessages = request.requestLog.filter((m) => m.method === 'sendMessage');
+    const infoMessageId = sentMessages[sentMessages.length - 1].result.result.message_id;
+    request.callbackQuery = {
+      id: 1, // sadly there is no way to emulate callback query so this will cause error in the console
+      message: { message_id: infoMessageId, chat: { id: request.env.CHAT_ID } },
+      data: COMMANDS.deleteCategory,
+    };
+    await route(request);
+    /** confirm message should be sent */
+    expect(request.countCalls('sendMessage')).toEqual(1);
+    /** category info message should be deleted */
+    expect(request.countCalls('deleteMessage')).toEqual(1);
+
+    sentMessages = request.requestLog.filter((m) => m.method === 'sendMessage');
+    const confirmMessageId = sentMessages[sentMessages.length - 1].result.result.message_id;
+    request.refresh();
+    request.callbackQuery = {
+      id: 1, // sadly there is no way to emulate callback query so this will cause error in the console
+      message: { message_id: confirmMessageId, chat: { id: request.env.CHAT_ID } },
+      data: COMMANDS.deleteCategoryConfirm,
+    };
+    await route(request);
+    /** confirm message should be deleted */
+    expect(request.countCalls('deleteMessage')).toEqual(1);
+    expect(request.user.data.hangingMessages.some((m) => m.type === MSG_TYPE.categoryRemovalConfirm)).toBe(false);
+    /** category removed */
+    expect(request.user.data.categories.some((c) => c.name === 'Test')).toBe(false);
   });
 });

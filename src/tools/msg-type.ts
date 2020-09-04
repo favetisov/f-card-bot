@@ -5,4 +5,5 @@ export enum MSG_TYPE {
   cardCreated = 'cardCreated',
   cardDisplayed = 'cardDisplayed',
   answerDisplayed = 'answerDisplayed',
+  categoryRemovalConfirm = 'categoryRemovalConfirm',
 }

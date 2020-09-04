@@ -192,8 +192,62 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
           [{ text: i18n.start_learning[request.user.data.language], callback_data: COMMANDS.startLearning }],
           [{ text: i18n.add_card[request.user.data.language], callback_data: COMMANDS.changeCategory }],
           [{ text: i18n.edit_category[request.user.data.language], callback_data: COMMANDS.changeCategory }],
+          [{ text: i18n.delete_category[request.user.data.language], callback_data: COMMANDS.deleteCategory }],
         ],
       },
+    });
+  },
+
+  askForCategoryRemoval: async (request: Request) => {
+    const category = request.user.data.categories.find((c) => c.selected);
+    const { result } = await request.botRequest('sendMessage', {
+      chat_id: request.chatId,
+      text: i18n.confirm_category_removal[request.user.data.language](category?.name),
+      parse_mode: 'MarkdownV2',
+      inline_keyboard: [
+        [
+          { text: i18n.remove[request.user.data.language], callback_data: COMMANDS.deleteCategoryConfirm },
+          { text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.deleteCategoryCancel },
+        ],
+      ],
+    });
+    await request.botRequest('deleteMessage', {
+      chat_id: request.chatId,
+      message_id: request.callbackQuery.message.message_id,
+    });
+    await request.user.update({
+      hangingMessages: [
+        ...request.user.data.hangingMessages.filter((m) => m.type !== MSG_TYPE.categoryRemovalConfirm),
+        { id: result.message_id, type: MSG_TYPE.categoryRemovalConfirm },
+      ],
+    });
+  },
+
+  deleteCategory: async (request: Request) => {
+    const confirmMessage = request.user.data.hangingMessages.find((m) => m.type === MSG_TYPE.categoryRemovalConfirm);
+
+    const category = request.user.data.categories.find((c) => c.selected);
+    const categories = request.user.data.categories.filter((c) => c.name !== category?.name);
+    if (categories.length) categories[0].selected = true;
+    await request.user.update({
+      categories,
+      hangingMessages: request.user.data.hangingMessages.filter((m) => m.id !== confirmMessage?.id),
+    });
+    await request.botRequest('deleteMessage', {
+      chat_id: request.chatId,
+      message_id: confirmMessage?.id,
+    });
+    await CategoryController.listCategories(request);
+  },
+
+  cancelCategoryRemoval: async (request: Request) => {
+    const confirmMessage = request.user.data.hangingMessages.find((m) => m.type === MSG_TYPE.categoryRemovalConfirm);
+    await request.user.update({
+      hangingMessages: request.user.data.hangingMessages.filter((m) => m.id === confirmMessage?.id),
+    });
+    await request.botRequest('deleteMessage', {
+      chat_id: request.chatId,
+      message_id: confirmMessage?.id,
     });
   },
 };

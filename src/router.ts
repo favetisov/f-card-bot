@@ -33,6 +33,12 @@ export const route = async (request: Request): Promise<any> => {
       return CategoryController.listCategories(request);
     } else if (command === COMMANDS.addCard) {
       return CardController.onAddCard(request);
+    } else if (command === COMMANDS.deleteCategory) {
+      return CategoryController.askForCategoryRemoval(request);
+    } else if (command === COMMANDS.deleteCategoryConfirm) {
+      return CategoryController.deleteCategory(request);
+    } else if (command === COMMANDS.deleteCategoryCancel) {
+      return CategoryController.cancelCategoryRemoval(request);
     }
   } else if (text) {
     if (text === '/ping') {

@@ -135,4 +135,16 @@ Let's create first category\\! Click button below to do so  ${emoji.point_down}
     en: 'Start learning  ' + emoji.arrow_forward,
     ru: 'Начать повторять  ' + emoji.arrow_forward,
   },
+  delete_category: {
+    en: 'Delete category ' + emoji.wastebasket,
+    ru: 'Удалить категорию ' + emoji.wastebasket,
+  },
+  confirm_category_removal: {
+    en: (name) => `Do you really want to delete category *${name}*?`,
+    ru: (name) => `Вы действительно хотите удалить категорию  *${name}*?`,
+  },
+  remove: {
+    en: 'Delete',
+    ru: 'Удалить',
+  },
 };
