@@ -32,9 +32,7 @@ export class Request {
   }
 
   constructor(webhookRequest) {
-    console.log(webhookRequest, 'REQUEST 222');
     this.message = webhookRequest.message;
-    console.log('after error');
     this.callbackQuery = webhookRequest.callbackQuery;
     this.botRequest = botRequest;
   }
