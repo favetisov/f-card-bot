@@ -33,7 +33,7 @@ export class Request {
 
   constructor(webhookRequest) {
     this.message = webhookRequest.message;
-    this.callbackQuery = webhookRequest.callbackQuery;
+    this.callbackQuery = webhookRequest.callback_query;
     this.botRequest = botRequest;
   }
 
