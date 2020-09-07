@@ -79,8 +79,16 @@ Let's create first category\\! Click button below to do so  ${emoji.point_down}
     en: 'Please provide category name. You can add optional description on a new line.',
     ru: 'Введите название категории. Если хотите, можете добавить описание на новой строчке',
   },
+  provide_new_category_name: {
+    en: 'Please provide new category name and description (on a new line)',
+    ru: 'Введите новое название категории и её описание (на новой строчке)',
+  },
+  no_category_to_edit: {
+    en: 'Category you are trying to edit does not exist',
+    ru: 'Категория, которую вы пытаетесь изменить, не существует',
+  },
   cancel_category_creation: {
-    en: 'Сancel creation',
+    en: 'Cancel creation',
     ru: 'Отменить создание',
   },
   category_name_exists: {

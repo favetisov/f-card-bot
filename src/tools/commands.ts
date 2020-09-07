@@ -14,4 +14,6 @@ export const COMMANDS = {
   deleteCategory: 'cmd_delete_category',
   deleteCategoryConfirm: 'cmd_delete_category_confirm',
   deleteCategoryCancel: 'cmd_delete_category_cancel',
+  editCategory: 'cmd_edit_category',
+  editCategoryCancel: 'cmd_edit_category',
 };

@@ -5,6 +5,8 @@ import { STATE } from '../tools/states';
 import { MSG_TYPE } from '../tools/msg-type';
 import { StartController } from './start.controller';
 
+const getCurrentCategory = (request) => request.user.data.categories.find((c) => c.selected);
+
 export const CategoryController = {
   listCategories: async (request: Request) => {
     const categories = request.user.data.categories;
@@ -199,7 +201,7 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
   },
 
   askForCategoryRemoval: async (request: Request) => {
-    const category = request.user.data.categories.find((c) => c.selected);
+    const category = getCurrentCategory(request);
     const { result } = await request.botRequest('sendMessage', {
       chat_id: request.chatId,
       text: i18n.confirm_category_removal[request.user.data.language](category?.name),
@@ -226,7 +228,7 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
   deleteCategory: async (request: Request) => {
     const confirmMessage = request.user.data.hangingMessages.find((m) => m.type === MSG_TYPE.categoryRemovalConfirm);
 
-    const category = request.user.data.categories.find((c) => c.selected);
+    const category = getCurrentCategory(request);
     const categories = request.user.data.categories.filter((c) => c.name !== category?.name);
     if (categories.length) categories[0].selected = true;
     await request.user.update({
@@ -249,5 +251,72 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
       chat_id: request.chatId,
       message_id: confirmMessage?.id,
     });
+  },
+
+  askForCategoryRename: async (request: Request) => {
+    const category = getCurrentCategory(request);
+
+    if (!category) {
+      await request.botRequest('sendMessage', {
+        chat_id: request.chatId,
+        text: i18n.no_category_to_edit[request.user.data.language],
+        inline_keyboard: [
+          [{ text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.editCategoryCancel }],
+        ],
+      });
+    } else {
+      const { result } = await request.botRequest('sendMessage', {
+        chat_id: request.chatId,
+        text: i18n.provide_new_category_name[request.user.data.language],
+        inline_keyboard: [
+          [{ text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.editCategoryCancel }],
+        ],
+      });
+
+      await request.user.update({
+        hangingMessages: [
+          ...request.user.data.hangingMessages,
+          { id: result.message_id, type: MSG_TYPE.provideNewCategoryName },
+        ],
+      });
+    }
+
+    await request.botRequest('deleteMessage', {
+      chat_id: request.chatId,
+      message_id: request.callbackQuery.message.message_id,
+    });
+
+    await request.botRequest('answerCallbackQuery', {
+      callback_query_id: request.callbackQuery.id,
+    });
+  },
+
+  cancelCategoryRename: async (request: Request) => {
+    const category = getCurrentCategory(request);
+    if (!category) {
+      await request.botRequest('sendMessage', {
+        chat_id: request.chatId,
+        text: i18n.no_category_to_edit[request.user.data.language],
+        inline_keyboard: [
+          [{ text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.editCategoryCancel }],
+        ],
+      });
+    } else {
+      await request.botRequest('sendMessage', {
+        chat_id: request.chatId,
+        text: i18n.provide_new_category_name[request.user.data.language],
+        inline_keyboard: [
+          [{ text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.editCategoryCancel }],
+        ],
+      });
+
+      await request.user.update({
+        hangingMessages: request.user.data.hangingMessages.filter((m) => m.type !== MSG_TYPE.provideNewCategoryName),
+      });
+    }
+  },
+
+  editCategory: async (request: Request) => {
+    const category = getCurrentCategory(request);
   },
 };

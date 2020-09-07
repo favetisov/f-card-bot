@@ -39,6 +39,10 @@ export const route = async (request: Request): Promise<any> => {
       return CategoryController.deleteCategory(request);
     } else if (command === COMMANDS.deleteCategoryCancel) {
       return CategoryController.cancelCategoryRemoval(request);
+    } else if (command === COMMANDS.editCategory) {
+      return CategoryController.askForCategoryRename(request);
+    } else if (command === COMMANDS.editCategoryCancel) {
+      return CategoryController.cancelCategoryRename(request);
     }
   } else if (text) {
     if (text === '/ping') {
@@ -62,6 +66,8 @@ export const route = async (request: Request): Promise<any> => {
         return CardController.addCardQuestion(request);
       } else if (request.user.data.state === STATE.waitingForCardAnswer) {
         return CardController.addCardAnswer(request);
+      } else if (request.user.data.state === STATE.waitingForNewCategoryName) {
+        // return CardController.editCategory(request);
       }
       // chatting in incorrect state
     }
