@@ -6,6 +6,7 @@ export const COMMANDS = {
   cancelCardCreation: 'cmd_create_card_cancel',
   changeCategory: 'cmd_change_category',
   setAnswer: 'cmd_set_answer',
+  setEmptyCardAnswer: 'cmd_set_empty_card_answer',
   skipCard: 'cmd_skip_card',
   showAnswer: 'cmd_show_answer',
   markAnswer: 'cmd_mark_answer',

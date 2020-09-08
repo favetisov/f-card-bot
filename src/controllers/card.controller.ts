@@ -3,6 +3,7 @@ import { i18n } from '../tools/i18n';
 import { COMMANDS } from '../tools/commands';
 import { STATE } from '../tools/states';
 import { MSG_TYPE } from '../tools/msg-type';
+import { CategoryController } from './category.controller';
 
 export const CardController = {
   onAddCard: async (request: Request) => {
@@ -71,7 +72,7 @@ export const CardController = {
           chat_id: request.chatId,
           reply_markup: {
             inline_keyboard: [
-              [{ text: i18n.create_new_category[request.user.data.language], callback_data: COMMANDS.createCategory }],
+              [{ text: i18n.unsolved[request.user.data.language], callback_data: COMMANDS.setEmptyCardAnswer }],
             ],
           },
           parse_mode: 'MarkdownV2',
@@ -130,6 +131,15 @@ export const CardController = {
         text: i18n.incorrect_card_format[request.user.data.language],
         chat_id: request.chatId,
       });
+    }
+  },
+
+  addEmptyCardAnswer: async (request: Request) => {
+    const card = request.user.data.categories.find((c) => c.selected)?.cards.find((c) => !c.published);
+    if (card) {
+      card.published = true;
+      await request.user.update({ categories: request.user.data.categories, state: STATE.ready });
+      await CategoryController.getCurrentState(request);
     }
   },
 

@@ -43,6 +43,8 @@ export const route = async (request: Request): Promise<any> => {
       return CategoryController.askForCategoryRename(request);
     } else if (command === COMMANDS.editCategoryCancel) {
       return CategoryController.cancelCategoryRename(request);
+    } else if (command === COMMANDS.setEmptyCardAnswer) {
+      return CardController.addEmptyCardAnswer;
     }
   } else if (text) {
     if (text === '/ping') {
