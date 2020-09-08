@@ -14,7 +14,7 @@ const fetch = require('node-fetch');
  *
  *      2. create file "environment.json" in this directory (/src/test-utils/), then put
  *        {
- *        "BOT_TOKEN": 1382487883:AAHw1-Bj3R9I6oDp2bV1g1ANTike5LzNoyE,
+ *        "BOT_TOKEN": "1382487883:AAHw1-Bj3R9I6oDp2bV1g1ANTike5LzNoyE",
  *        "CHAT_ID": YOUR_CHAT_ID
  *        } *
  *        with your token and chat id values

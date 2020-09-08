@@ -192,8 +192,8 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
       reply_markup: {
         inline_keyboard: [
           [{ text: i18n.start_learning[request.user.data.language], callback_data: COMMANDS.startLearning }],
-          [{ text: i18n.add_card[request.user.data.language], callback_data: COMMANDS.changeCategory }],
-          [{ text: i18n.edit_category[request.user.data.language], callback_data: COMMANDS.changeCategory }],
+          [{ text: i18n.add_card[request.user.data.language], callback_data: COMMANDS.addCard }],
+          [{ text: i18n.edit_category[request.user.data.language], callback_data: COMMANDS.editCategory }],
           [{ text: i18n.delete_category[request.user.data.language], callback_data: COMMANDS.deleteCategory }],
         ],
       },
@@ -206,12 +206,14 @@ learned: ${cardsLevels.filter((l) => l > 3).length}
       chat_id: request.chatId,
       text: i18n.confirm_category_removal[request.user.data.language](category?.name),
       parse_mode: 'MarkdownV2',
-      inline_keyboard: [
-        [
-          { text: i18n.remove[request.user.data.language], callback_data: COMMANDS.deleteCategoryConfirm },
-          { text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.deleteCategoryCancel },
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: i18n.remove[request.user.data.language], callback_data: COMMANDS.deleteCategoryConfirm },
+            { text: i18n.cancel[request.user.data.language], callback_data: COMMANDS.deleteCategoryCancel },
+          ],
         ],
-      ],
+      }
     });
     await request.botRequest('deleteMessage', {
       chat_id: request.chatId,
