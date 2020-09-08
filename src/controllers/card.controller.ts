@@ -44,9 +44,11 @@ export const CardController = {
         await CardController.sendNoCategoriesMessage(request);
       } else {
         const maxId = Math.max(...category.cards.map((c) => c.id), 0);
+        const question = { text, photoId, videoId, caption };
+        Object.keys(question).forEach(key => question[key] === undefined && delete question[key]);
         category.cards.push({
           id: maxId + 1,
-          question: { text, photoId, videoId, caption },
+          question: question,
           published: false,
           answer: null,
           attempts: [],
