@@ -1,4 +1,4 @@
 node_modules/
 dist/
 /src/test-utils/environment.json
-/users.db
+/users.json
