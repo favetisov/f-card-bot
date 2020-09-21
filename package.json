@@ -40,7 +40,7 @@
     "rimraf": "^3.0.2",
     "semver": "^7.3.2",
     "simple-git": "^2.15.0",
-    "ts-jest": "^26.1.4",
+    "ts-jest": "^26.4.0",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^3.9.7"
