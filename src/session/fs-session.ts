@@ -12,9 +12,7 @@ export class FsSession<SessionData> implements Session<SessionData> {
 
   async load(key): Promise<SessionData> {
     const users = await this.loadAll();
-    if (!users[key]) {
-      users[key] = await this.update(key, this.initialData);
-    }
+    users[key] ??= await this.update(key, this.initialData);
     this.data = users[key];
     return this.data;
   }
@@ -22,7 +20,7 @@ export class FsSession<SessionData> implements Session<SessionData> {
   async update(key, data): Promise<SessionData> {
     return new Promise(async (resolve, reject) => {
       const users = await this.loadAll();
-      if (!users[key]) users[key] = <SessionData>{};
+      users[key] ??= <SessionData>{};
       for (const k in data) {
         users[key][k] = data[k];
       }
