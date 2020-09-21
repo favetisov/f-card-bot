@@ -30,7 +30,7 @@
   "homepage": "https://github.com/favetisov/f-card-bot#readme",
   "devDependencies": {
     "@types/jest": "^26.0.8",
-    "conventional-changelog-cli": "^2.0.34",
+    "conventional-changelog-cli": "^2.1.0",
     "express": "^4.17.1",
     "inquirer": "^7.3.3",
     "jest": "^26.2.1",
