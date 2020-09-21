@@ -1,7 +1,9 @@
+import { MessageEntity } from 'telegram-typings';
+
 export interface Card {
   id: number;
-  title: string;
-  description: string;
-  answer: string;
-  attempts: any[];
+  question: { text?: string; caption?: string; photoId?: string; videoId?: string; entities?: MessageEntity[] };
+  editing: boolean;
+  answer: { text?: string; caption?: string; photoId?: string; videoId?: string; entities?: MessageEntity[] } | null;
+  attempts: Array<{ timestamp: number; mark: number }>;
 }

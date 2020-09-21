@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch ./src -e ts --exec 'npm t'",
+    "start-server": "nodemon --watch src -e ts --exec 'ts-node -r tsconfig-paths/register src/server.ts'",
     "build": "npm run clean && ./node_modules/typescript/bin/tsc",
     "clean": "rimraf 'dist'",
     "release": "npm run build && node scripts/release.js",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.8",
     "conventional-changelog-cli": "^2.0.34",
+    "express": "^4.17.1",
     "inquirer": "^7.3.3",
     "jest": "^26.2.1",
     "nodemon": "^2.0.4",
@@ -39,10 +41,15 @@
     "semver": "^7.3.2",
     "simple-git": "^2.15.0",
     "ts-jest": "^26.1.4",
+    "ts-node": "^9.0.0",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.9.7"
   },
   "dependencies": {
     "@google-cloud/firestore": "^4.2.0",
-    "node-fetch": "^2.6.0"
+    "lodash": "^4.17.20",
+    "node-fetch": "^2.6.0",
+    "rxjs": "^6.6.3",
+    "telegram-typings": "^4.0.0-beta"
   }
 }
