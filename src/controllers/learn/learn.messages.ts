@@ -12,13 +12,13 @@ export const LearnMessages = {
       [
         button({
           text: localize(context, i18n.skip_card),
-          command: CALLBACK_COMMAND.showNextCard,
+          command: CALLBACK_COMMAND.skipCard,
+          parameters: { cardId: card.id },
           clickReport: localize(context, i18n.card_skipped),
         }),
         button({
           text: localize(context, i18n.stop_learning),
           command: CALLBACK_COMMAND.showState,
-          parameters: { cardId: card.id },
           clickReport: localize(context, i18n.learning_stopped),
         }),
         button({
@@ -53,6 +53,9 @@ export const LearnMessages = {
       chat_id: context.update.chatId,
       text:
         localize(context, i18n.card_number, { number: card.id + '' }) +
+        localize(context, i18n.card_knowledge, {
+          score: escapeMd((card.attempts || []).reduce((s, a) => s + a.mark, 0) + ''),
+        }) +
         '\n\n' +
         localize(context, i18n.question) +
         entitiesToMd(card.question?.text, card.question.entities),
@@ -85,9 +88,15 @@ export const LearnMessages = {
       ],
       [
         button({
+          text: localize(context, i18n.edit_question),
+          command: CALLBACK_COMMAND.editCardQuestion,
+          parameters: { cardId: card.id },
+          clickReport: localize(context, i18n.editing_question),
+        }),
+        button({
           text: localize(context, i18n.edit_answer),
           command: CALLBACK_COMMAND.editCardAnswer,
-          parameters: { cardId: card.id, mark: 1 },
+          parameters: { cardId: card.id },
           clickReport: localize(context, i18n.editing_answer),
         }),
       ],

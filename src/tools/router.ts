@@ -30,7 +30,7 @@ export const getHandler = (context: Context): Handler | undefined => {
       }
     } else if ('onCommand' in r) {
       if (!context.update.callbackData) return;
-      return parseInt(context.update.callbackData.command) === r.onCommand;
+      return context.update.callbackData.command === r.onCommand;
     } else {
       return; // other methods not supported yet
     }

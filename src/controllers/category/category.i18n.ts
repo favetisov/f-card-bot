@@ -15,8 +15,8 @@ export const CategoryI18n = {
     ru: 'Выбрать категорию ${name}',
   },
   selected_category: {
-    en: 'Selected category *${name}*',
-    ru: 'Выбрана категория *${name}*',
+    en: 'Selected *${name}*',
+    ru: 'Выбрана *${name}*',
   },
   you_dont_have_categories: {
     en: "You don't have any category yet",

@@ -38,8 +38,8 @@ export const CardController = {
 
       // provided category key
       if (context.update.message.text.startsWith('-c')) {
-        const [_, categoryName, question] = context.update.message.text.split(' ');
-        context.update.message.text = question;
+        const [_, categoryName, ...question] = context.update.message.text.split(' ');
+        context.update.message.text = question.join(' ');
         const categories = context.session.data.categories;
         const category = categories.find((c) => c.name.toLowerCase().includes(categoryName.toLowerCase()));
         if (category) {
@@ -61,10 +61,11 @@ export const CardController = {
    */
   addCardQuestion: async (context: Context) => {
     const text = context.update.message?.text?.trim();
+    const entities = context.update.message?.entities;
     if (!text) {
       await send(context, msg.incorrectQuestionFormat(context));
     } else {
-      const question = { text };
+      const question = { text, entities };
       const category = context.session.data.categories.find((c) => c.selected);
       const cardId = Math.max(...category.cards.map((c) => c.id), 0) + 1;
       category.cards.push({
@@ -107,12 +108,13 @@ export const CardController = {
    */
   addCardAnswer: async (context: Context) => {
     const text = context.update.message?.text?.trim();
+    const entities = context.update.message?.entities;
     const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.editing === true);
     if (!text || !card) {
       await send(context, msg.incorrectAnswerFormat(context));
     } else {
       card.editing = false;
-      card.answer = { text };
+      card.answer = { text, entities };
       await Promise.all([
         context.session.update(context.sessionKey, { categories: context.session.data.categories, state: STATE.ready }),
         send(context, CategoryMessages.state(context)),
@@ -201,12 +203,13 @@ export const CardController = {
    */
   setNewCardAnswer: async (context: Context) => {
     const text = context.update.message?.text?.trim();
+    const entities = context.update.message?.entities;
     const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.editing === true);
     if (!text || !card) {
       await send(context, msg.incorrectNewAnswerFormat(context));
     } else {
       card.editing = false;
-      card.answer = { text };
+      card.answer = { text, entities };
       await Promise.all([
         context.session.update(context.sessionKey, { categories: context.session.data.categories, state: STATE.ready }),
         send(context, CategoryMessages.state(context)),

@@ -35,6 +35,8 @@ export const CategoryMessages = {
         ]),
       );
     }
+    console.log(buttons);
+
     return {
       chat_id: context.update.chatId,
       text: text,

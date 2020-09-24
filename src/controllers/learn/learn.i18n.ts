@@ -63,6 +63,10 @@ export const LearnI18n = {
     en: '*Card №${number}*',
     ru: '*Вопрос №${number}*',
   },
+  card_knowledge: {
+    en: ' \\(_Current knowledge_: ${score}\\)',
+    ru: ' \\(_Знание карточки_: ${score}\\)',
+  },
   question: {
     en: '*Q*:',
     ru: '*В*:',

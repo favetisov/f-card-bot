@@ -29,6 +29,8 @@ export const entitiesToMd = (text = '', entities: MessageEntity[] = []): any => 
   const getEntitySymbols = (entity: MessageEntity) => {
     if (entity.type === 'bold') return ['*', '*'];
     if (entity.type === 'italic') return ['_', '_'];
+    if (entity.type === 'code') return ['`', '`'];
+    if (entity.type === 'pre') return ['`', '`'];
     if (entity.type === 'underline') return ['__', '__'];
     if (entity.type === 'strikethrough') return ['~', '~'];
     if (entity.type === 'text_link') return ['[', `](${entity.url})`];

@@ -44,6 +44,7 @@ export const routes: Array<MessageRoute | CommandRoute> = [
   /** learn */
   { onMessage: '/go', handler: LearnController.onShowNextCard },
   { onCommand: CALLBACK_COMMAND.showNextCard, handler: LearnController.onShowNextCard },
+  { onCommand: CALLBACK_COMMAND.skipCard, handler: LearnController.onSkipCard },
   { onCommand: CALLBACK_COMMAND.showAnswer, handler: LearnController.onShowAnswer },
   { onCommand: CALLBACK_COMMAND.markAnswer, handler: LearnController.onMarkAnswer },
 ];

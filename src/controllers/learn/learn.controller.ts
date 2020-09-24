@@ -2,6 +2,8 @@ import { Context } from '@src/context';
 import { LearnMessages as msg } from './learn.messages';
 import { send } from '@src/bot';
 import { STATE } from '@src/enums/state';
+import { Card } from '@src/models/card';
+import { last, sortBy } from 'lodash';
 
 export const LearnController = {
   /**
@@ -44,11 +46,45 @@ export const LearnController = {
       await LearnController.onShowNextCard(context);
     }
   },
+
+  /**
+   * on 'skip card' button click
+   * @param context
+   */
+  onSkipCard: async (context: Context) => {
+    const cardId = context.update.callbackData?.parameters['cardId'];
+    const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.id == cardId);
+    const mark = null;
+    if (card) {
+      card.attempts.push({ timestamp: new Date().getTime(), mark });
+      await context.session.update(context.sessionKey, { categories: context.session.data.categories });
+      await LearnController.onShowNextCard(context);
+    }
+  },
 };
 
 const defineCardToDisplay = (context: Context) => {
   const category = context.session.data.categories.find((c) => c.selected);
-  const cards = category?.cards || [];
-  const card = cards[Math.round(Math.random() * (cards.length - 1))];
-  return card;
+  const cards: Card[] = category?.cards || [];
+  const getScore = (card) => {
+    const NO_ANSWER_WEIGHT = -1000;
+    const SKIP_WEIGHT = 2000;
+    let score: number;
+    if (!card.attempts?.length) {
+      score = NO_ANSWER_WEIGHT + Math.random();
+    } else {
+      const attemptsSum = (card.attempts || []).reduce((sum, att) => sum + att.mark ?? 0, 1);
+      const lastAttemptMark = last(card.attempts).mark;
+      const diff = new Date().getTime() - Math.max(...card.attempts.map((a) => a.timestamp));
+      const diffDays = diff / (1000 * 60 * 60 * 24);
+      const reduceScore = (2 - lastAttemptMark) * diffDays;
+      score = (attemptsSum - reduceScore) * Math.random();
+    }
+    if (last(card.attempts || [])?.mark === null) score += SKIP_WEIGHT;
+    return score;
+  };
+
+  const sortedCards = sortBy(cards, getScore);
+
+  return sortedCards[0];
 };
