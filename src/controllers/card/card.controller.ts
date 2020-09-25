@@ -1,3 +1,4 @@
+import { last } from 'lodash';
 import { Context } from '@src/context';
 import { STATE } from '@src/enums/state';
 import { send } from '@src/bot';
@@ -34,24 +35,31 @@ export const CardController = {
    */
   inlineAddQuestion: async (context: Context) => {
     if (context.update.message?.text) {
-      context.update.message.text = context.update.message.text.replace(/\s\s+/g, ' ').split('/add ')[1];
-
-      // provided category key
-      if (context.update.message.text.startsWith('-c')) {
-        const [_, categoryName, ...question] = context.update.message.text.split(' ');
-        context.update.message.text = question.join(' ');
-        const categories = context.session.data.categories;
-        const category = categories.find((c) => c.name.toLowerCase().includes(categoryName.toLowerCase()));
-        if (category) {
-          const categories = context.session.data.categories.map((c) =>
-            Object.assign(c, { selected: c.name === category.name }),
-          );
-          await context.session.update(context.sessionKey, { categories });
-        } else {
-          // todo send 'cat not found message'
+      const prefixMatches = context.update.message.text.match('^/add[ ]+(-c[ ]+[^ ]+[ ]+)?');
+      if (prefixMatches && prefixMatches[0]) {
+        const match = prefixMatches[0];
+        const entitiesShift = match.length; // shifting all entities offset and length due to command and category prefixes
+        if (match.includes('-c')) {
+          const categoryName = last(match.trim().split(' '));
+          const categories = context.session.data.categories;
+          const category = categories.find((c) => c.name.toLowerCase().includes(categoryName.toLowerCase()));
+          if (category) {
+            const categories = context.session.data.categories.map((c) =>
+              Object.assign(c, { selected: c.name === category.name }),
+            );
+            await context.session.update(context.sessionKey, { categories });
+          } else {
+            /* todo send 'cat not found message' */
+          }
         }
+        context.update.message.text = context.update.message?.text.slice(match.length);
+        if (context.update.message?.entities) {
+          context.update.message.entities = context.update.message.entities
+            .filter((e) => e.type !== 'bot_command')
+            .map((e) => Object.assign(e, { offset: e.offset - entitiesShift }));
+        }
+        await CardController.addCardQuestion(context);
       }
-      await CardController.addCardQuestion(context);
     }
   },
 
@@ -61,7 +69,7 @@ export const CardController = {
    */
   addCardQuestion: async (context: Context) => {
     const text = context.update.message?.text?.trim();
-    const entities = context.update.message?.entities;
+    const entities = context.update.message?.entities?.filter((e) => e.type !== 'bot_command');
     if (!text) {
       await send(context, msg.incorrectQuestionFormat(context));
     } else {
@@ -108,7 +116,7 @@ export const CardController = {
    */
   addCardAnswer: async (context: Context) => {
     const text = context.update.message?.text?.trim();
-    const entities = context.update.message?.entities;
+    const entities = context.update.message?.entities?.filter((e) => e.type !== 'bot_command');
     const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.editing === true);
     if (!text || !card) {
       await send(context, msg.incorrectAnswerFormat(context));
@@ -147,7 +155,7 @@ export const CardController = {
     const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.editing === true);
     if (card) {
       const text = context.update.message?.text?.trim();
-      const entities = context.update.message?.entities;
+      const entities = context.update.message?.entities?.filter((e) => e.type !== 'bot_command');
       if (!text) {
         await send(context, msg.incorrectNewQuestionFormat(context));
       } else {
@@ -203,7 +211,7 @@ export const CardController = {
    */
   setNewCardAnswer: async (context: Context) => {
     const text = context.update.message?.text?.trim();
-    const entities = context.update.message?.entities;
+    const entities = context.update.message?.entities?.filter((e) => e.type !== 'bot_command');
     const card = context.session.data.categories.find((c) => c.selected)?.cards.find((c) => c.editing === true);
     if (!text || !card) {
       await send(context, msg.incorrectNewAnswerFormat(context));
