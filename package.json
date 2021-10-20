@@ -34,7 +34,7 @@
     "express": "^4.17.1",
     "inquirer": "^7.3.3",
     "jest": "^26.4.2",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.14",
     "prettier": "^2.1.2",
     "replace-in-file": "^6.1.0",
     "rimraf": "^3.0.2",
