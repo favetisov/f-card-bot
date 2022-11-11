@@ -48,7 +48,7 @@
   "dependencies": {
     "@google-cloud/firestore": "^4.2.0",
     "lodash": "^4.17.20",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.3.0",
     "rxjs": "^6.6.3",
     "telegram-typings": "^4.0.0-beta"
   }
